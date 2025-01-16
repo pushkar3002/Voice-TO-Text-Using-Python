@@ -1,5 +1,8 @@
-# Use an official base image (e.g., Python, Node.js, etc.)
-FROM python:3.9-slim  # For a Python project (adjust as needed)
+# Use the official Python image as a base image
+FROM python:3.9-slim
+
+# Set environment variables to prevent Python from buffering stdout
+ENV PYTHONUNBUFFERED=1
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -7,14 +10,19 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install any necessary dependencies (for Python, using pip)
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies for PyAudio and SpeechRecognition
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    portaudio19-dev \
+    libffi-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Expose the port your app will run on
-EXPOSE 5000  # Change to the port your application uses
+# Install Python dependencies
+RUN pip install --no-cache-dir flask SpeechRecognition pyaudio
 
-# Define environment variables (optional)
-ENV APP_ENV=production
+# Expose the port the app runs on
+EXPOSE 5000
 
-# Command to run your application
-CMD ["python", "app.py"]  # Change this to your main script or entry point
+# Run the Python script directly
+CMD ["python", "main.py"]
