@@ -1,2 +1,4 @@
-Flask 
-speechrecognition
+Python
+pip or pip3 install Flask 
+pip or pip3 install speechrecognition
+
